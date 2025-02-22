@@ -8,7 +8,11 @@ const fs = require("fs");
 const sharp = require("sharp");
 
 // Initialize Firebase
-const serviceAccount = require("./firedrop-c17e5-firebase-adminsdk-fbsvc-235500774e.json");
+const admin = require("firebase-admin");
+
+const serviceAccount = JSON.parse(
+    Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT, "base64").toString("utf-8")
+);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
