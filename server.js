@@ -7,8 +7,6 @@ const cors = require("cors");
 const fs = require("fs");
 const sharp = require("sharp");
 
-// Initialize Firebase
-const admin = require("firebase-admin");
 
 const serviceAccount = JSON.parse(
     Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT, "base64").toString("utf-8")
