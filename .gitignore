@@ -1,0 +1,32 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log
+yarn.lock
+package-lock.json
+
+# Environment variables
+.env
+serviceAccountKey.json
+
+# Firebase storage cache
+firebase-debug.log
+firebase.json
+
+# Uploaded files (prevent committing local uploads)
+uploads/
+thumbnails/
+
+# Temp files
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# OS-specific files
+.idea/
+.vscode/
+*.swp
+
+# Logs
+logs/
+*.log
