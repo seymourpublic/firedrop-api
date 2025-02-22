@@ -6,7 +6,7 @@ package-lock.json
 
 # Environment variables
 .env
-serviceAccountKey.json
+firedrop-c17e5-firebase-adminsdk-fbsvc-235500774e.json
 
 # Firebase storage cache
 firebase-debug.log
