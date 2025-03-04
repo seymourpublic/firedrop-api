@@ -1,4 +1,4 @@
-# FireDrop API 🚀🔥
+# FireDrop API 
 
 ## Overview
 FireDrop is a lightweight and scalable file upload API built with **Node.js, Express, and Firebase Storage**. It allows you to **upload, generate thumbnails (for images), and delete files** seamlessly.
@@ -13,7 +13,7 @@ FireDrop is a lightweight and scalable file upload API built with **Node.js, Exp
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### 1️⃣ Install Dependencies
 ```sh

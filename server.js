@@ -34,55 +34,61 @@ app.post("/upload", upload.single("file"), async (req, res) => {
   if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
   try {
-    const filePath = req.file.path;
-    const fileName = `${Date.now()}-${req.file.originalname}`;
-    const fileUpload = bucket.file(fileName);
+      const filePath = req.file.path;
+      const fileName = `${Date.now()}-${req.file.originalname}`;
+      const fileUpload = bucket.file(fileName);
 
-    // Upload the file to Firebase Storage
-    await fileUpload.save(fs.readFileSync(filePath), {
-      metadata: { contentType: req.file.mimetype },
-    });
-
-    // Make file publicly accessible
-    await fileUpload.makePublic();
-    const fileUrl = `https://storage.googleapis.com/${process.env.FIREBASE_STORAGE_BUCKET}/${fileName}`;
-
-    let thumbUrl = null;
-
-    // Generate thumbnail ONLY if the file is an image
-    if (req.file.mimetype.startsWith("image/")) {
-      const thumbName = `thumb-${fileName}`;
-      const thumbPath = `uploads/${thumbName}`;
-
-      await sharp(filePath).resize(200, 200).toFile(thumbPath);
-      const thumbUpload = bucket.file(`thumbnails/${thumbName}`);
-      await thumbUpload.save(fs.readFileSync(thumbPath), {
-        metadata: { contentType: req.file.mimetype },
+      // Upload the file to Firebase Storage
+      await fileUpload.save(fs.readFileSync(filePath), {
+          metadata: { contentType: req.file.mimetype },
       });
 
-      await thumbUpload.makePublic();
-      thumbUrl = `https://storage.googleapis.com/${process.env.FIREBASE_STORAGE_BUCKET}/thumbnails/${thumbName}`;
+      // Get public URL
+      const [fileUrl] = await fileUpload.getSignedUrl({
+          action: "read",
+          expires: "03-09-2030", // Set expiration far in the future
+      });
 
-      // Remove local thumbnail file
+      let thumbUrl = null;
+
+      // Generate thumbnail ONLY if the file is an image
+      if (req.file.mimetype.startsWith("image/")) {
+          const thumbName = `thumbnails/thumb-${fileName}`;
+          const thumbPath = `uploads/${thumbName}`;
+
+          await sharp(filePath).resize(200, 200).toFile(thumbPath);
+          const thumbUpload = bucket.file(thumbName);
+          await thumbUpload.save(fs.readFileSync(thumbPath), {
+              metadata: { contentType: req.file.mimetype },
+          });
+
+          // Get public URL for thumbnail
+          const [thumbSignedUrl] = await thumbUpload.getSignedUrl({
+              action: "read",
+              expires: "03-09-2030",
+          });
+          thumbUrl = thumbSignedUrl;
+
+          // Remove local thumbnail file
+          if (fs.existsSync(thumbPath)) {
+              try {
+                  fs.unlinkSync(thumbPath);
+              } catch (error) {
+                  console.warn("Warning: Could not delete temp thumbnail", error.message);
+              }
+          }
+      }
+
+      // Remove local temp file
       if (fs.existsSync(filePath)) {
-        try {
-          fs.unlinkSync(filePath);
-        } catch (error) {
-          console.warn("Warning: Could not delete temp file", error.message);
-        }
-      }
-    }
-
-    // Remove local temp file
-    if (fs.existsSync(filePath)) {
-        fs.unlink(filePath, (err) => {
-          if (err) console.warn("Warning: Could not delete temp file", err.message);
-        });
+          fs.unlink(filePath, (err) => {
+              if (err) console.warn("Warning: Could not delete temp file", err.message);
+          });
       }
 
-    res.json({ message: "File uploaded successfully", url: fileUrl, thumbnail: thumbUrl });
+      res.json({ message: "File uploaded successfully", url: fileUrl, thumbnail: thumbUrl });
   } catch (error) {
-    res.status(500).json({ message: "Upload failed", error: error.message });
+      res.status(500).json({ message: "Upload failed", error: error.message });
   }
 });
 
