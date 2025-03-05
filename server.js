@@ -19,7 +19,13 @@ admin.initializeApp({
 
 const bucket = admin.storage().bucket();
 const app = express();
-app.use(cors());
+const corsOptions = {
+    origin: '*', // Allow all origins
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // Allow common HTTP methods
+    allowedHeaders: ['Content-Type', 'Authorization'] // Allow these headers
+  };
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Multer Configuration - No File Type Restrictions, 50MB Limit
