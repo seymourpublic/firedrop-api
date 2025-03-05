@@ -53,7 +53,7 @@ app.post("/upload", upload.single("file"), async (req, res) => {
       let thumbUrl = null;
 
       // Generate thumbnail ONLY if the file is an image
-      if (req.file.mimetype.startsWith("image/")) {
+     /* if (req.file.mimetype.startsWith("image/")) {
           const thumbName = `thumbnails/thumb-${fileName}`;
           const thumbPath = `uploads/${thumbName}`;
 
@@ -78,7 +78,7 @@ app.post("/upload", upload.single("file"), async (req, res) => {
                   console.warn("Warning: Could not delete temp thumbnail", error.message);
               }
           }
-      }
+      }*/
 
       // Remove local temp file
       if (fs.existsSync(filePath)) {
