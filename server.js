@@ -39,9 +39,10 @@ app.post("/upload", upload.single("file"), async (req, res) => {
       const fileUpload = bucket.file(fileName);
 
       // Upload the file to Firebase Storage
-      await fileUpload.save(fs.readFileSync(filePath), {
-          metadata: { contentType: req.file.mimetype },
-      });
+      const metadata = {
+        contentType: req.file.mimetype,  // Ensure Firebase recognizes the file type
+        };
+      await fileUpload.save(fs.readFileSync(filePath), { metadata });
 
       // Get public URL
       const [fileUrl] = await fileUpload.getSignedUrl({
