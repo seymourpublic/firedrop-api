@@ -114,6 +114,31 @@ app.delete("/delete/:fileName", async (req, res) => {
   }
 });
 
+app.get("/files/:fileNameOrUrl", async (req, res) => {
+    try {
+      let fileName = req.params.fileNameOrUrl;
+  
+      // If the input is a full URL, extract the file name
+      if (fileName.startsWith("http")) {
+        const urlParts = fileName.split("/");
+        fileName = urlParts[urlParts.length - 1]; // Extract file name from URL
+      }
+  
+      const file = bucket.file(fileName);
+  
+      // Check if file exists
+      const [exists] = await file.exists();
+      if (!exists) return res.status(404).json({ message: "File not found" });
+  
+      // Return the direct public URL
+      const fileUrl = `https://storage.googleapis.com/${process.env.FIREBASE_STORAGE_BUCKET}/${fileName}`;
+      
+      res.json({ message: "File found", url: fileUrl });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch file", error: error.message });
+    }
+  });
+
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🔥 FireDrop API running on port ${PORT}`));
